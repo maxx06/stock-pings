@@ -8,13 +8,20 @@ api_key = os.getenv("API_KEY")
 
 queryApi = QueryApi(api_key=api_key)
 
+ticker = "TSLA"
+
 query = {
-  "query": "ticker:TSLA AND filedAt:[2020-01-01 TO 2020-12-31] AND formType:\"10-Q\"",
-  "from": "0",
-  "size": "10",
-  "sort": [{ "filedAt": { "order": "desc" } }]
+    "query": { "query_string": { 
+        "query": f'formType:"4" AND ticker:"{ticker}"',
+    }},
+    "from": "0",
+    "size": "10",
+    "sort": [{"filedAt": {"order": "desc"}}]  # Sort by most recent filings
 }
 
-filings = queryApi.get_filings(query)
+response = queryApi.get_filings(query)
 
-print(filings)
+# Print first few results
+for filing in response['filings']:
+    print(filing)
+    print(f"Date: {filing['filedAt']}, Insider: {filing['entities'][0]['name']}, Link: {filing['link']}")
